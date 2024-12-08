@@ -45,6 +45,9 @@ frontend {{ haproxy_frontend_name }}
 
 backend {{ haproxy_backend_name }}
     mode {{ haproxy_backend_mode }}
+    http-check connect ssl
+    http-check send meth GET uri /healthz
+    http-check expect status 200
     balance {{ haproxy_backend_balance_method }}
     option forwardfor
 {% if haproxy_backend_httpchk != '' %}
@@ -52,5 +55,5 @@ backend {{ haproxy_backend_name }}
 {% endif %}
     cookie SERVERID insert indirect
 {% for backend in haproxy_backend_servers %}
-    server {{ backend.name }} {{ backend.address }} cookie {{ backend.name }} check
+    server {{ backend.name }} {{ backend.address }} cookie {{ backend.name }} check verify none
 {% endfor %}
